@@ -1,66 +1,90 @@
 package parking
 
+import java.util.*
+import javax.print.DocFlavor
 import kotlin.system.exitProcess
 
+val scanner = Scanner(System.`in`)
 
+const val PARKING_IS_EMPTY = "Parking lot is empty."
 const val NO_PARKING = "Sorry, the parking lot is full."
 const val PARK = "park"
 const val LEAVE = "leave"
+const val CREATE = "create"
+const val STATUS = "status"
 
-val spotOne = Spot(1, false)
-val spotTwo = Spot(2, false)
-val spotThree = Spot(3, false)
-val spotFour = Spot(4, false)
-val spotFive = Spot(5, false)
-val spotSix = Spot(6, false)
-val spotSeven = Spot(7, false)
-val spotEight = Spot(8, false)
-val spotNine = Spot(9, false)
-val spotTen = Spot(10, false)
-val spotEleven = Spot(11, false)
-val spotTwelve = Spot(12, false)
-val spotThirteen = Spot(13, false)
-val spotFourteen = Spot(14, false)
-val spotFifteen = Spot(15, false)
-val spotSixteen = Spot(16, false)
-val spotSeventeen = Spot(17, false)
-val spotEighteen = Spot(18, false)
-val spotNineteen = Spot(19, false)
-val spotTwenty = Spot(20, false)
+val spots = mutableListOf(
+        Spot(1, false),
+        Spot(2, false),
+        Spot(3, false),
+        Spot(4, false),
+        Spot(5, false),
+        Spot(6, false),
+        Spot(7, false),
+        Spot(8, false),
+        Spot(9, false),
+        Spot(10, false),
+        Spot(11, false),
+        Spot(12, false),
+        Spot(13, false),
+        Spot(14, false),
+        Spot(15, false),
+        Spot(16, false),
+        Spot(17, false),
+        Spot(18, false),
+        Spot(19, false),
+        Spot(20, false))
 
 var command = ""
+var spotsCounter: Int = 0
+var numberSpotsInString: String = ""
+
+// повторение команды create - true
+var commandCreate = false
 
 fun main() {
     parking(start())
 }
 
 fun start(): String {
-    command = readLine().toString().trim()
+    // вход в программу с проверкой команды create
+    do {
+        command = readLine().toString().trim()
+        val initCommandCreate = command(command)
+        if (initCommandCreate == "exit") {
+            exitProcess(0)
+        }
+        if (initCommandCreate != CREATE) {
+            println("Sorry, a parking lot has not been created.")
+        }
+    } while (initCommandCreate != CREATE)
     return command
 }
 
 fun nextCommand() {
-    command = readLine().toString().trim()
+    command = scanner.nextLine().trim()
     parking(command)
 }
 
-// true - park   &&   false - leave
-fun checkCommand(command: String): Boolean {
-    var park = ""
-    var leave = ""
-    if (command.length > 4) {
-        park = command.substring(0, 4)
-        leave = command.substring(0, 5)
-    }
-    when {
-        park == PARK -> return true
-        leave == LEAVE -> return false
-    }
-    return false
+fun command(command: String): String {
+    return command.substringBefore(' ')
 }
 
 fun carColor(command: String): String {
     return command.substringAfterLast(' ')
+}
+
+fun carRegistrationNumber(command: String): String {
+    val after = command.substringAfter(' ')
+    return after.substringBefore(' ')
+}
+
+fun numberOfSpots(command: String): String {
+    return command.substringAfter(' ')
+}
+
+fun numberOfCreatedParkingSpots(quantity: String): Int {
+    return quantity.toInt()
 }
 
 fun parking(command: String) {
@@ -70,14 +94,45 @@ fun parking(command: String) {
     }
 
     val color = carColor(command)
-    val currentCommand = checkCommand(command)
-    if (!currentCommand) {
+    val carRegistrationNumber = carRegistrationNumber(command)
+    val currentCommand = command(command)
+
+    if (currentCommand == CREATE) {
+        numberSpotsInString = numberOfSpots(command)
+        if (!commandCreate) {
+            commandCreate = true
+            println("Created a parking lot with $numberSpotsInString spots.")
+            spotsCounter = numberOfCreatedParkingSpots(numberSpotsInString)
+            nextCommand()
+        }
+        if (commandCreate) {
+            for (spot in spots) {
+                if (spot.spotInBusy()) {
+                    spot.setStatusFreeOrBusy(false)
+                    spot.setNumberOfCar("")
+                    spot.setCarColor("")
+                }
+            }
+            println("Created a parking lot with $numberSpotsInString spots.")
+            spotsCounter = numberOfCreatedParkingSpots(numberSpotsInString)
+            nextCommand()
+        }
+    }
+
+    if (currentCommand == STATUS) {
+        if (showStatus(spots)) println(PARKING_IS_EMPTY)
+        nextCommand()
+    }
+
+    if (currentCommand == LEAVE) {
         val num = command.substringAfter(' ')
 
         when (num.toInt()) {
             1 -> {
-                if (spotOne.spotInBusy()) {
-                    spotOne.setStatus(false)
+                if (spots[0].spotInBusy()) {
+                    spots[0].setStatusFreeOrBusy(false)
+                    spots[0].setNumberOfCar("")
+                    spots[0].setCarColor("")
                     println("Spot 1 is free.")
                 } else {
                     println("There is no car in spot 1.")
@@ -85,8 +140,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             2 -> {
-                if (spotTwo.spotInBusy()) {
-                    spotTwo.setStatus(false)
+                if (spots[1].spotInBusy()) {
+                    spots[1].setStatusFreeOrBusy(false)
+                    spots[1].setNumberOfCar("")
+                    spots[1].setCarColor("")
                     println("Spot 2 is free.")
                 } else {
                     println("There is no car in spot 2.")
@@ -94,8 +151,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             3 -> {
-                if (spotThree.spotInBusy()) {
-                    spotThree.setStatus(false)
+                if (spots[2].spotInBusy()) {
+                    spots[2].setStatusFreeOrBusy(false)
+                    spots[2].setNumberOfCar("")
+                    spots[2].setCarColor("")
                     println("Spot 3 is free.")
                 } else {
                     println("There is no car in spot 3.")
@@ -103,8 +162,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             4 -> {
-                if (spotFour.spotInBusy()) {
-                    spotFour.setStatus(false)
+                if (spots[3].spotInBusy()) {
+                    spots[3].setStatusFreeOrBusy(false)
+                    spots[3].setNumberOfCar("")
+                    spots[3].setCarColor("")
                     print("Spot 4 is free.")
                 } else {
                     println("There is no car in spot 4.")
@@ -112,8 +173,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             5 -> {
-                if (spotFive.spotInBusy()) {
-                    spotFive.setStatus(false)
+                if (spots[4].spotInBusy()) {
+                    spots[4].setStatusFreeOrBusy(false)
+                    spots[4].setNumberOfCar("")
+                    spots[4].setCarColor("")
                     println("Spot 5 is free.")
                 } else {
                     println("There is no car in spot 5.")
@@ -121,8 +184,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             6 -> {
-                if (spotSix.spotInBusy()) {
-                    spotSix.setStatus(false)
+                if (spots[5].spotInBusy()) {
+                    spots[5].setStatusFreeOrBusy(false)
+                    spots[5].setNumberOfCar("")
+                    spots[5].setCarColor("")
                     println("Spot 6 is free.")
                 } else {
                     println("There is no car in spot 6.")
@@ -130,8 +195,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             7 -> {
-                if (spotSeven.spotInBusy()) {
-                    spotSeven.setStatus(false)
+                if (spots[6].spotInBusy()) {
+                    spots[6].setStatusFreeOrBusy(false)
+                    spots[6].setNumberOfCar("")
+                    spots[6].setCarColor("")
                     println("Spot 7 is free.")
                 } else {
                     println("There is no car in spot 7.")
@@ -139,8 +206,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             8 -> {
-                if (spotEight.spotInBusy()) {
-                    spotEight.setStatus(false)
+                if (spots[7].spotInBusy()) {
+                    spots[7].setStatusFreeOrBusy(false)
+                    spots[7].setNumberOfCar("")
+                    spots[7].setCarColor("")
                     println("Spot 8 is free.")
                 } else {
                     println("There is no car in spot 8.")
@@ -148,8 +217,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             9 -> {
-                if (spotNine.spotInBusy()) {
-                    spotNine.setStatus(false)
+                if (spots[8].spotInBusy()) {
+                    spots[8].setStatusFreeOrBusy(false)
+                    spots[8].setNumberOfCar("")
+                    spots[8].setCarColor("")
                     println("Spot 9 is free.")
                 } else {
                     println("There is no car in spot 9.")
@@ -157,8 +228,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             10 -> {
-                if (spotTen.spotInBusy()) {
-                    spotTen.setStatus(false)
+                if (spots[9].spotInBusy()) {
+                    spots[9].setStatusFreeOrBusy(false)
+                    spots[9].setNumberOfCar("")
+                    spots[9].setCarColor("")
                     println("Spot 10 is free.")
                 } else {
                     println("There is no car in spot 10.")
@@ -166,8 +239,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             11 -> {
-                if (spotEleven.spotInBusy()) {
-                    spotEleven.setStatus(false)
+                if (spots[10].spotInBusy()) {
+                    spots[10].setStatusFreeOrBusy(false)
+                    spots[10].setNumberOfCar("")
+                    spots[10].setCarColor("")
                     println("Spot 11 is free.")
                 } else {
                     println("There is no car in spot 11.")
@@ -175,8 +250,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             12 -> {
-                if (spotTwelve.spotInBusy()) {
-                    spotTwelve.setStatus(false)
+                if (spots[11].spotInBusy()) {
+                    spots[11].setStatusFreeOrBusy(false)
+                    spots[11].setNumberOfCar("")
+                    spots[11].setCarColor("")
                     println("Spot 12 is free.")
                 } else {
                     println("There is no car in spot 12.")
@@ -184,8 +261,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             13 -> {
-                if (spotThirteen.spotInBusy()) {
-                    spotThirteen.setStatus(false)
+                if (spots[12].spotInBusy()) {
+                    spots[12].setStatusFreeOrBusy(false)
+                    spots[12].setNumberOfCar("")
+                    spots[12].setCarColor("")
                     println("Spot 13 is free.")
                 } else {
                     println("There is no car in spot 13.")
@@ -193,8 +272,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             14 -> {
-                if (spotFourteen.spotInBusy()) {
-                    spotFourteen.setStatus(false)
+                if (spots[13].spotInBusy()) {
+                    spots[13].setStatusFreeOrBusy(false)
+                    spots[13].setNumberOfCar("")
+                    spots[13].setCarColor("")
                     println("Spot 14 is free.")
                 } else {
                     println("There is no car in spot 14.")
@@ -202,8 +283,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             15 -> {
-                if (spotFifteen.spotInBusy()) {
-                    spotFifteen.setStatus(false)
+                if (spots[14].spotInBusy()) {
+                    spots[14].setStatusFreeOrBusy(false)
+                    spots[14].setNumberOfCar("")
+                    spots[14].setCarColor("")
                     println("Spot 15 is free.")
                 } else {
                     println("There is no car in spot 15.")
@@ -211,8 +294,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             16 -> {
-                if (spotSixteen.spotInBusy()) {
-                    spotSixteen.setStatus(false)
+                if (spots[15].spotInBusy()) {
+                    spots[15].setStatusFreeOrBusy(false)
+                    spots[15].setNumberOfCar("")
+                    spots[15].setCarColor("")
                     println("Spot 16 is free.")
                 } else {
                     println("There is no car in spot 16.")
@@ -220,8 +305,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             17 -> {
-                if (spotSeventeen.spotInBusy()) {
-                    spotSeventeen.setStatus(false)
+                if (spots[16].spotInBusy()) {
+                    spots[16].setStatusFreeOrBusy(false)
+                    spots[16].setNumberOfCar("")
+                    spots[16].setCarColor("")
                     println("Spot 17 is free.")
                 } else {
                     println("There is no car in spot 17.")
@@ -229,8 +316,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             18 -> {
-                if (spotEighteen.spotInBusy()) {
-                    spotEighteen.setStatus(false)
+                if (spots[17].spotInBusy()) {
+                    spots[17].setStatusFreeOrBusy(false)
+                    spots[17].setNumberOfCar("")
+                    spots[17].setCarColor("")
                     println("Spot 18 is free.")
                 } else {
                     println("There is no car in spot 18.")
@@ -238,8 +327,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             19 -> {
-                if (spotNineteen.spotInBusy()) {
-                    spotNineteen.setStatus(false)
+                if (spots[18].spotInBusy()) {
+                    spots[18].setStatusFreeOrBusy(false)
+                    spots[18].setNumberOfCar("")
+                    spots[18].setCarColor("")
                     println("Spot 19 is free.")
                 } else {
                     println("There is no car in spot 19.")
@@ -247,8 +338,10 @@ fun parking(command: String) {
                 nextCommand()
             }
             20 -> {
-                if (spotTwenty.spotInBusy()) {
-                    spotTwenty.setStatus(false)
+                if (spots[19].spotInBusy()) {
+                    spots[19].setStatusFreeOrBusy(false)
+                    spots[19].setNumberOfCar("")
+                    spots[19].setCarColor("")
                     println("Spot 20 is free.")
                 } else {
                     println("There is no car in spot 20.")
@@ -258,87 +351,227 @@ fun parking(command: String) {
         }
     }
 
-    if (currentCommand) {
+    if (currentCommand == PARK) {
         when {
-            !spotOne.spotInBusy() -> {
-                spotOne.setStatus(true)
-                println("$color car parked in spot 1.")
+            !spots[0].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[0].setStatusFreeOrBusy(true)
+                    spots[0].setNumberOfCar(carRegistrationNumber)
+                    spots[0].setCarColor(color)
+                    println("$color car parked in spot 1.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotTwo.spotInBusy() -> {
-                spotTwo.setStatus(true)
-                println("$color car parked in spot 2.")
+            !spots[1].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[1].setStatusFreeOrBusy(true)
+                    spots[1].setNumberOfCar(carRegistrationNumber)
+                    spots[1].setCarColor(color)
+                    println("$color car parked in spot 2.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotThree.spotInBusy() -> {
-                spotThree.setStatus(true)
-                println("$color car parked in spot 3.")
+            !spots[2].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[2].setStatusFreeOrBusy(true)
+                    spots[2].setNumberOfCar(carRegistrationNumber)
+                    spots[2].setCarColor(color)
+                    println("$color car parked in spot 3.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotFour.spotInBusy() -> {
-                spotFour.setStatus(true)
-                println("$color car parked in spot 4.")
+            !spots[3].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[3].setStatusFreeOrBusy(true)
+                    spots[3].setNumberOfCar(carRegistrationNumber)
+                    spots[3].setCarColor(color)
+                    println("$color car parked in spot 4.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotFive.spotInBusy() -> {
-                spotFive.setStatus(true)
-                println("$color car parked in spot 5.")
+            !spots[4].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[4].setStatusFreeOrBusy(true)
+                    spots[4].setNumberOfCar(carRegistrationNumber)
+                    spots[4].setCarColor(color)
+                    println("$color car parked in spot 5.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotSix.spotInBusy() -> {
-                spotSix.setStatus(true)
-                println("$color car parked in spot 6.")
+            !spots[5].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[5].setStatusFreeOrBusy(true)
+                    spots[5].setNumberOfCar(carRegistrationNumber)
+                    spots[5].setCarColor(color)
+                    println("$color car parked in spot 6.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotSeven.spotInBusy() -> {
-                spotSeven.setStatus(true)
-                println("$color car parked in spot 7.")
+            !spots[6].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[6].setStatusFreeOrBusy(true)
+                    spots[6].setNumberOfCar(carRegistrationNumber)
+                    spots[6].setCarColor(color)
+                    println("$color car parked in spot 7.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotEight.spotInBusy() -> {
-                spotEight.setStatus(true)
-                println("$color car parked in spot 8.")
+            !spots[7].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[7].setStatusFreeOrBusy(true)
+                    spots[7].setNumberOfCar(carRegistrationNumber)
+                    spots[7].setCarColor(color)
+                    println("$color car parked in spot 8.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotNine.spotInBusy() -> {
-                spotNine.setStatus(true)
-                println("$color car parked in spot 9.")
+            !spots[8].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[8].setStatusFreeOrBusy(true)
+                    spots[8].setNumberOfCar(carRegistrationNumber)
+                    spots[8].setCarColor(color)
+                    println("$color car parked in spot 9.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotTen.spotInBusy() -> {
-                spotTen.setStatus(true)
-                println("$color car parked in spot 10.")
+            !spots[9].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[9].setStatusFreeOrBusy(true)
+                    spots[9].setNumberOfCar(carRegistrationNumber)
+                    spots[9].setCarColor(color)
+                    println("$color car parked in spot 10.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotEleven.spotInBusy() -> {
-                spotEleven.setStatus(true)
-                println("$color car parked in spot 11.")
+            !spots[10].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[10].setStatusFreeOrBusy(true)
+                    spots[10].setNumberOfCar(carRegistrationNumber)
+                    spots[10].setCarColor(color)
+                    println("$color car parked in spot 11.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotTwelve.spotInBusy() -> {
-                spotTwelve.setStatus(true)
-                println("$color car parked in spot 12.")
+            !spots[11].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[11].setStatusFreeOrBusy(true)
+                    spots[11].setNumberOfCar(carRegistrationNumber)
+                    spots[11].setCarColor(color)
+                    println("$color car parked in spot 12.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotThirteen.spotInBusy() -> {
-                spotThirteen.setStatus(true)
-                println("$color car parked in spot 13.")
+            !spots[12].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[12].setStatusFreeOrBusy(true)
+                    spots[12].setNumberOfCar(carRegistrationNumber)
+                    spots[12].setCarColor(color)
+                    println("$color car parked in spot 13.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotFourteen.spotInBusy() -> {
-                spotFourteen.setStatus(true)
-                println("$color car parked in spot 14.")
+            !spots[13].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[13].setStatusFreeOrBusy(true)
+                    spots[13].setNumberOfCar(carRegistrationNumber)
+                    spots[13].setCarColor(color)
+                    println("$color car parked in spot 14.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotFifteen.spotInBusy() -> {
-                spotFifteen.setStatus(true)
-                println("$color car parked in spot 15.")
+            !spots[14].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[14].setStatusFreeOrBusy(true)
+                    spots[14].setNumberOfCar(carRegistrationNumber)
+                    spots[14].setCarColor(color)
+                    println("$color car parked in spot 15.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotSixteen.spotInBusy() -> {
-                spotSixteen.setStatus(true)
-                println("$color car parked in spot 16.")
+            !spots[15].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[15].setStatusFreeOrBusy(true)
+                    spots[15].setNumberOfCar(carRegistrationNumber)
+                    spots[15].setCarColor(color)
+                    println("$color car parked in spot 16.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotSeventeen.spotInBusy() -> {
-                spotSeventeen.setStatus(true)
-                println("$color car parked in spot 17.")
+            !spots[16].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[16].setStatusFreeOrBusy(true)
+                    spots[16].setNumberOfCar(carRegistrationNumber)
+                    spots[16].setCarColor(color)
+                    println("$color car parked in spot 17.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotEighteen.spotInBusy() -> {
-                spotEighteen.setStatus(true)
-                println("$color car parked in spot 18.")
+            !spots[17].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[17].setStatusFreeOrBusy(true)
+                    spots[17].setNumberOfCar(carRegistrationNumber)
+                    spots[17].setCarColor(color)
+                    println("$color car parked in spot 18.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotNineteen.spotInBusy() -> {
-                spotNineteen.setStatus(true)
-                println("$color car parked in spot 19.")
+            !spots[18].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[18].setStatusFreeOrBusy(true)
+                    spots[18].setNumberOfCar(carRegistrationNumber)
+                    spots[18].setCarColor(color)
+                    println("$color car parked in spot 19.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
-            !spotTwenty.spotInBusy() -> {
-                spotTwenty.setStatus(true)
-                println("$color car parked in spot 20.")
+            !spots[19].spotInBusy() -> {
+                if (spotsCounter > 0) {
+                    spotsCounter--
+                    spots[19].setStatusFreeOrBusy(true)
+                    spots[19].setNumberOfCar(carRegistrationNumber)
+                    spots[19].setCarColor(color)
+                    println("$color car parked in spot 20.")
+                } else {
+                    println(NO_PARKING)
+                }
             }
             else -> println(NO_PARKING)
         }
@@ -346,17 +579,47 @@ fun parking(command: String) {
     }
 }
 
-data class Spot(private val num: Int, private var free: Boolean) {
+fun showStatus(list: MutableList<Spot>): Boolean {
+    var free = true
+    for (spot in list) {
+        if (spot.spotInBusy()) {
+            println("${spot.spotNumber()} ${spot.numberOfCar()} ${spot.carColor()}")
+            free = false
+        }
+    }
+    return free
+}
 
-    fun setStatus(status: Boolean) {
-        free = status
+data class Spot(private val parkingSpaceNumber: Int,
+                private var isFree: Boolean,
+                private var numberOfCar: String = "",
+                private var carColor: String = "") {
+
+    fun spotNumber(): Int {
+        return parkingSpaceNumber
+    }
+
+    fun setStatusFreeOrBusy(status: Boolean) {
+        isFree = status
     }
 
     fun spotInBusy(): Boolean {
-        return free
+        return isFree
     }
 
-    fun spotNumber(): Int {
-        return num
+    fun setNumberOfCar(number: String) {
+        numberOfCar = number
+    }
+
+    fun numberOfCar(): String {
+        return numberOfCar
+    }
+
+    fun setCarColor(color: String) {
+        carColor = color
+    }
+
+    fun carColor(): String {
+        return carColor
     }
 }
