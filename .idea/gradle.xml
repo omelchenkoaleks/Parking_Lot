@@ -13,7 +13,10 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Parking Lot/task" />
+            <option value="$PROJECT_DIR$/Problems/Celsius to Fahrenheit" />
+            <option value="$PROJECT_DIR$/Problems/Evaluate an expression" />
             <option value="$PROJECT_DIR$/Problems/House inheritance" />
+            <option value="$PROJECT_DIR$/Problems/Liquid pressure" />
             <option value="$PROJECT_DIR$/Problems/copy() usage" />
             <option value="$PROJECT_DIR$/Problems/equals() check" />
             <option value="$PROJECT_DIR$/Problems/toString() modification" />

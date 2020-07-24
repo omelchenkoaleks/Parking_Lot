@@ -3,3 +3,6 @@ content:
 - copy() usage
 - equals() check
 - toString() modification
+- Celsius to Fahrenheit
+- Liquid pressure
+- Evaluate an expression
