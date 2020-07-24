@@ -1,7 +1,6 @@
 package parking
 
 import java.util.*
-import javax.print.DocFlavor
 import kotlin.system.exitProcess
 
 val scanner = Scanner(System.`in`)
@@ -12,6 +11,9 @@ const val PARK = "park"
 const val LEAVE = "leave"
 const val CREATE = "create"
 const val STATUS = "status"
+const val REG_BY_COLOR = "reg_by_color"
+const val SPOT_BY_COLOR = "spot_by_color"
+const val SPOT_BY_REG = "spot_by_reg"
 
 val spots = mutableListOf(
         Spot(1, false),
@@ -124,6 +126,54 @@ fun parking(command: String) {
         nextCommand()
     }
 
+    if (currentCommand == REG_BY_COLOR) {
+        var inStock = false
+        val arrNumberOfCar = mutableListOf<String>()
+        for (spot in spots) {
+            if (spot.carColor().toUpperCase() == color.toUpperCase()) {
+                arrNumberOfCar.add(spot.numberOfCar())
+                inStock = true
+            }
+        }
+        if (!inStock) {
+            println("No cars with color $color were found.")
+        } else {
+            println(arrNumberOfCar.joinToString())
+        }
+        nextCommand()
+    }
+
+    if (currentCommand == SPOT_BY_COLOR) {
+        var inStock = false
+        val arrSpotNumber = mutableListOf<Int>()
+        for (spot in spots) {
+            if (spot.carColor().toUpperCase() == color.toUpperCase()) {
+                arrSpotNumber.add(spot.spotNumber())
+                inStock = true
+            }
+        }
+        if (!inStock) {
+            println("No cars with color $color were found.")
+        } else {
+            println(arrSpotNumber.joinToString())
+        }
+        nextCommand()
+    }
+
+    if (currentCommand == SPOT_BY_REG) {
+        var inStock = false
+        for (spot in spots) {
+            if (spot.numberOfCar() == carRegistrationNumber) {
+                println(spot.spotNumber())
+                inStock = true
+            }
+        }
+        if (!inStock) {
+            println("No cars with registration number $carRegistrationNumber were found.")
+        }
+        nextCommand()
+    }
+
     if (currentCommand == LEAVE) {
         val num = command.substringAfter(' ')
 
@@ -166,7 +216,7 @@ fun parking(command: String) {
                     spots[3].setStatusFreeOrBusy(false)
                     spots[3].setNumberOfCar("")
                     spots[3].setCarColor("")
-                    print("Spot 4 is free.")
+                    println("Spot 4 is free.")
                 } else {
                     println("There is no car in spot 4.")
                 }
